@@ -1,37 +1,31 @@
 import streamlit as st
-import requests
-import json
+import cloudscraper
 
-st.title("Sistema di Pronostici Calcio - Estrazione Diretta")
-st.write("Questo software estrae i dati direttamente dalla fonte senza usare API a pagamento.")
+st.title("Sistema di Pronostici Calcio - Infiltrazione Livello 2")
+st.write("Questo software usa un browser fantasma per eludere i blocchi di sicurezza.")
 
 if st.button("Estrai Partite Odierne da Sofascore"):
-    with st.spinner("Infiltrazione in corso..."):
-        # L'indirizzo interno nascosto che Sofascore usa per mostrare i risultati sul suo sito
+    with st.spinner("Infiltrazione avanzata in corso..."):
         url = "https://api.sofascore.com/api/v1/sport/football/events/schedule/today"
         
-        # Tecnica di camuffamento: diciamo al server che siamo un normale utente su Google Chrome
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            "Accept": "*/*",
-            "Accept-Language": "it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7",
-            "Referer": "https://www.sofascore.com/"
-        }
+        # Creiamo un "browser fantasma" che simula al 100% un vero Google Chrome
+        scraper = cloudscraper.create_scraper(browser={
+            'browser': 'chrome',
+            'platform': 'windows',
+            'desktop': True
+        })
         
         try:
-            # Eseguiamo la richiesta di estrazione
-            response = requests.get(url, headers=headers)
+            response = scraper.get(url)
             
             if response.status_code == 200:
-                st.success("Dati estratti con successo e blocco superato!")
-                dati = response.json()
-                
-                # Mostriamo a schermo i dati grezzi estratti
-                st.json(dati)
+                st.success("BINGO! Il buttafuori è stato ingannato. Dati estratti con successo!")
+                # Mostra i dati catturati a schermo
+                st.json(response.json())
             elif response.status_code == 403:
-                st.error("Accesso negato: il buttafuori (Cloudflare) ha riconosciuto che siamo un bot. Dobbiamo potenziare il camuffamento.")
+                st.error("Cloudflare ha gli scudi al massimo livello (Errore 403). Dobbiamo passare al Piano C.")
             else:
-                st.error(f"Errore imprevisto. Codice: {response.status_code}")
+                st.error(f"Errore imprevisto dal server. Codice: {response.status_code}")
                 
         except Exception as e:
-            st.error(f"Si è verificato un errore tecnico: {e}")
+            st.error(f"Errore tecnico di connessione: {e}")
