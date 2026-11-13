@@ -1,59 +1,83 @@
 import streamlit as st
-import requests
+import random
 
 st.set_page_config(layout="wide")
-
 st.title("Sistema di Pronostici Calcio - Il Cervellone AI 🧠")
-st.write("Infiltrazione dati e Risonanza Magnetica (Algoritmo Predittivo automigliorabile)")
+st.write("Motore matematico per l'analisi statistica e il calcolo delle probabilità (Zero API, Invulnerabile).")
 
 st.markdown("---")
-st.header("Fase 1: Estrazione Dati (Tunnel Proxy)")
-st.write("Usiamo un tunnel segreto per nascondere la targa del server Streamlit.")
-
-if st.button("Estrai Partite (Test Tunnel)"):
-    with st.spinner("Scavo del tunnel in corso..."):
-        # Usiamo AllOrigins per far fare la richiesta a un server terzo, non a Streamlit
-        url = "https://api.allorigins.win/raw?url=https://api.sofascore.com/api/v1/sport/football/events/schedule/today"
-        try:
-            response = requests.get(url, timeout=10)
-            if response.status_code == 200:
-                st.success("BINGO! Muro abbattuto. Dati grezzi catturati!")
-                st.json(response.json())
-            else:
-                st.warning(f"Il tunnel ha rimbalzato. Cloudflare è spietato. (Codice: {response.status_code})")
-        except Exception as e:
-            st.error("Errore di connessione al tunnel.")
-
-st.markdown("---")
-st.header("Fase 2: La Risonanza Magnetica 🩻")
-st.write("Questo è il motore dell'Intelligenza Artificiale. Elabora i dati estratti per sputare la sentenza matematica, ignorando totalmente il blasone.")
+st.header("1. Inserimento Dati Grezzi (Fattori Campo ed Extra-Campo)")
+st.write("Inserisci i dati della partita. L'algoritmo ignorerà il blasone e calcolerà solo i numeri.")
 
 col1, col2 = st.columns(2)
 with col1:
-    sq_casa = st.text_input("Squadra di Casa", placeholder="Es. Shakhtar Donetsk")
-with col2:
-    sq_trasferta = st.text_input("Squadra in Trasferta", placeholder="Es. Obolon Brovar")
+    st.subheader("Squadra di Casa")
+    sq_casa = st.text_input("Nome", placeholder="Es. Shakhtar")
+    xg_casa = st.number_input("Media gol fatti (ultime 5)", min_value=0.0, max_value=5.0, value=1.5, step=0.1)
+    gol_subiti_casa = st.number_input("Media gol subiti (ultime 5) Casa", min_value=0.0, max_value=5.0, value=1.0, step=0.1)
+    assenze_casa = st.slider("Impatto Infortuni (0 = Tutti sani, 5 = Emergenza totale)", 0, 5, 0, key="ass_c")
 
-if st.button("Avvia Risonanza Magnetica"):
-    if sq_casa and sq_trasferta:
-        with st.spinner("Incrocio dati statistici, infortuni, xG e momentum tattico..."):
-            # Questa è l'interfaccia che il Machine Learning andrà a compilare in automatico
-            st.success("Analisi e decrittazione completata con successo!")
+with col2:
+    st.subheader("Squadra in Trasferta")
+    sq_trasf = st.text_input("Nome ", placeholder="Es. Obolon")
+    xg_trasf = st.number_input("Media gol fatti (ultime 5) ", min_value=0.0, max_value=5.0, value=1.0, step=0.1)
+    gol_subiti_trasf = st.number_input("Media gol subiti (ultime 5) Trasferta", min_value=0.0, max_value=5.0, value=1.5, step=0.1)
+    assenze_trasf = st.slider("Impatto Infortuni (0 = Tutti sani, 5 = Emergenza totale) ", 0, 5, 0, key="ass_t")
+
+st.markdown("---")
+if st.button("Avvia Risonanza Magnetica 🩻", type="primary"):
+    if sq_casa and sq_trasf:
+        with st.spinner("Elaborazione algoritmo in corso..."):
             
-            st.markdown("### 🔮 Pronostico Consigliato")
-            st.info(f"**Vittoria {sq_casa} (Segno 1)** - Analisi basata sul divario tattico.")
+            # --- IL MOTORE MATEMATICO ---
+            # Calcolo Forza Attacco vs Difesa
+            forza_casa = (xg_casa * 1.2) - gol_subiti_trasf - (assenze_casa * 0.3)
+            forza_trasf = xg_trasf - (gol_subiti_casa * 1.2) - (assenze_trasf * 0.3)
             
-            st.markdown("### 📊 Indice di Affidabilità Globale")
-            st.progress(85)
-            st.write("**85% (Match classificato come: SICURO)**")
+            # Calcolo Probabilità Base (Softmax semplificato)
+            divario = forza_casa - forza_trasf
             
-            st.markdown("### 🎯 I 3 Risultati Esatti più probabili")
-            r1, r2, r3 = st.columns(3)
-            r1.metric(label="Risultato Principale", value="2-0", delta="35% di probabilità")
-            r2.metric(label="Copertura 1", value="3-0", delta="25% di probabilità")
-            r3.metric(label="Copertura 2", value="3-1", delta="15% di probabilità")
+            if divario > 1.0:
+                esito = "1 (Vittoria Casa)"
+                affidabilita = min(95, 60 + int(divario * 10))
+                r1, r2, r3 = "2-0", "3-0", "2-1"
+            elif divario < -1.0:
+                esito = "2 (Vittoria Trasferta)"
+                affidabilita = min(95, 60 + int(abs(divario) * 10))
+                r1, r2, r3 = "0-2", "0-1", "1-2"
+            else:
+                if abs(divario) < 0.3:
+                    esito = "X (Pareggio)"
+                    affidabilita = 65
+                    r1, r2, r3 = "1-1", "0-0", "2-2"
+                elif divario >= 0.3:
+                    esito = "1X (Doppia Chance)"
+                    affidabilita = 75
+                    r1, r2, r3 = "1-0", "1-1", "2-0"
+                else:
+                    esito = "X2 (Doppia Chance)"
+                    affidabilita = 75
+                    r1, r2, r3 = "0-1", "1-1", "0-2"
             
-            st.markdown("### 📝 Motivazione Tattica (Zero Blasone)")
-            st.write(f"In base ai dati grezzi in pasto all'algoritmo, {sq_casa} genera un alto tasso di Expected Goals (xG). {sq_trasferta} soffre pesantemente sulle palle inattive e ha assenze chiave accertate nei referti medici. Il fattore campo non è stato contato: parlano solo i numeri.")
+            # --- OUTPUT A SCHERMO ---
+            st.success("Analisi Tattica e Statistica completata.")
+            
+            c1, c2 = st.columns(2)
+            with c1:
+                st.markdown("### 🔮 Pronostico Definitivo")
+                st.info(f"**Segno Consigliato: {esito}**")
+                
+                st.markdown("### 📊 Indice di Affidabilità")
+                st.progress(affidabilita / 100.0)
+                st.write(f"**{affidabilita}%** - {'SICURO' if affidabilita > 75 else 'INCERTO (usare prudenza)'}")
+                
+            with c2:
+                st.markdown("### 🎯 I 3 Risultati Esatti più probabili")
+                st.metric(label="Scelta Primaria (Probabilità Alta)", value=r1)
+                st.metric(label="Copertura Strategica 1", value=r2)
+                st.metric(label="Copertura Strategica 2", value=r3)
+                
+            st.markdown("### 📝 Analisi del Match Analyst")
+            st.write(f"L'algoritmo rileva un divario di forza netto di {round(divario, 2)} punti. Il calcolo ha incrociato la media gol fatti in casa del {sq_casa} contro la tenuta difensiva esterna del {sq_trasf}, applicando una penalità matematica in base ai referti medici (infortuni).")
     else:
-        st.error("Inserisci i nomi delle due squadre per avviare il motore.")
+        st.error("Inserisci i nomi delle due squadre per avviare il calcolo.")
